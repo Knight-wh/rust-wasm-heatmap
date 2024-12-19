@@ -51,22 +51,22 @@ impl HeatMap {
         (row * self.size_x + colume) as usize
     }
 
-    fn get_row(&self, x: f64) -> u32 {
-        ((x - self.min_x) / self.per_pixel).floor() as u32
+    fn get_row(&self, y: f64) -> u32 {
+        ((y - self.min_y) / self.per_pixel).floor() as u32
     }
 
-    fn get_col(&self, y: f64) -> u32 {
-        ((y - self.min_y) / self.per_pixel).floor() as u32
+    fn get_col(&self, x: f64) -> u32 {
+        ((x - self.min_x) / self.per_pixel).floor() as u32
     }
 
     fn update_heat_values(&mut self, point: &HeatPoint) {
         let radius = self.radius;
-        let row = self.get_row(point.x);
-        let col = self.get_col(point.y);
+        let row = self.get_row(point.y);
+        let col = self.get_col(point.x);
         for dx in -(radius as i32)..=radius as i32 {
             for dy in -(radius as i32)..=radius as i32 {
-                let nx = row as i32 + dx;
-                let ny = col as i32 + dy;
+                let nx = col as i32 + dx;
+                let ny = row as i32 + dy;
 
                 if nx >= 0 && nx < self.size_x as i32 && ny >= 0 && ny < self.size_y as i32 {
                     let distance = ((dx * dx + dy * dy) as f64).sqrt();
@@ -74,7 +74,7 @@ impl HeatMap {
                     if weight < 0.0 {
                         continue;
                     }
-                    let idx = self.get_index(nx as u32, ny as u32);
+                    let idx = self.get_index(ny as u32, nx as u32);
                     self.heat_values[idx] += point.value * weight;
                 }
             }

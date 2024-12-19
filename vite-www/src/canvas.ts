@@ -9,7 +9,7 @@ const minX = 0.0,
   maxX = 10.0,
   maxY = 10.0,
   maxHeat = 20.0;
-const heatmap = HeatMap.new(canvasWidth, minX, minY, maxX, maxY, maxHeat);
+const heatmap = HeatMap.new(200, 10.0, minX, minY, maxX, maxY, maxHeat);
 const gradient = ["00AAFF", "00FF00", "FFFF00", "FF8800", "FF0000"];
 const rgbas = parseGradient(gradient).map((g) => RGBA.new(g.r, g.g, g.b, 255));
 heatmap.set_gradients(rgbas);
@@ -20,17 +20,14 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
 
   const hw = heatmap.width();
   const hh = heatmap.height();
-  console.log(heatmap.width(), heatmap.height());
+  console.log("width", hw);
+  console.log("height", hh);
 
   const points = [];
   for (let i = 0; i < 50; i++) {
-    points.push(
-      HeatPoint.new(
-        Math.random() * maxX,
-        Math.random() * maxY,
-        Math.random() * maxHeat
-      )
-    );
+    let x = Math.random() * (maxX - minX) + minX;
+    let y = Math.random() * (maxY - minY) + minY;
+    points.push(HeatPoint.new(x, y, Math.random() * maxHeat));
   }
   heatmap.add_points(points);
   const ctx = canvas.getContext("2d");
@@ -42,9 +39,10 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
     colorsPtr,
     4 * hw * hh
   );
+  ctx.strokeRect(0, 0, hw, hh);
   const imageData = new ImageData(colorsArr, hw, hh);
   createImageBitmap(imageData, { imageOrientation: "flipY" }).then((bitmap) => {
-    ctx.drawImage(bitmap, 0, 0, hw, hh);
+    ctx.drawImage(bitmap, 0, 0);
   });
 }
 
