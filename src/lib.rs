@@ -132,6 +132,7 @@ impl HeatMap {
 impl HeatMap {
     pub fn new(
         width: usize,
+        radius: usize,
         min_x: f64,
         min_y: f64,
         max_x: f64,
@@ -140,7 +141,6 @@ impl HeatMap {
     ) -> HeatMap {
         utils::set_panic_hook();
 
-        let radius = 10;
         let size_x = width;
 
         let delta_x = max_x - min_x;
@@ -165,7 +165,7 @@ impl HeatMap {
         HeatMap {
             size_x: size_x as u32,
             size_y: size_y as u32,
-            radius,
+            radius: radius as u32,
             max_heat,
             gradient,
             min_x,
@@ -202,6 +202,11 @@ impl HeatMap {
 
     pub fn set_max_heat(&mut self, max_heat: f64) {
         self.max_heat = max_heat;
+        self.update_color_values();
+    }
+
+    pub fn set_radius(&mut self, radius: usize) {
+        self.radius = radius as u32;
         self.update_color_values();
     }
 
