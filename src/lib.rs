@@ -181,12 +181,28 @@ impl HeatMap {
         self.update_color_values();
     }
 
-    // TODO: optimize for wasm-bindgen
     // https://rustwasm.github.io/wasm-bindgen/reference/types.html
     pub fn add_points(&mut self, points: Vec<HeatPoint>) {
         for point in points {
             self.update_heat_values(&point);
         }
+        self.update_color_values();
+    }
+
+    // * Optimize for receiving data across the WebAssembly ABI boundary
+    pub fn add_points_v2(&mut self, points: Vec<f64>) {
+        assert!(
+            points.len() % 3 == 0,
+            "Points length must be a multiple of 3"
+        );
+
+        for chunk in points.chunks(3) {
+            let x = chunk[0];
+            let y = chunk[1];
+            let value = chunk[2];
+            self.update_heat_values(&HeatPoint::new(x, y, value));
+        }
+
         self.update_color_values();
     }
 
