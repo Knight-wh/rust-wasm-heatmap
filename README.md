@@ -2,17 +2,9 @@
 
 A simple HeatMap implementation for learning Rust🦀 and Wasm🕸.
 
-## 🚴 Usage
+## Usage
 
-### Build with `wasm-pack build`
-
-```
-wasm-pack build
-```
-
-You should add "rust_heatmap_bg.wasm.d.ts" in pkg/package.json
-
-### use the npm packages
+There is an example in /vite-www.
 
 ```
 cd vite-www
@@ -21,6 +13,16 @@ pnpm install
 
 pnpm dev
 ```
+
+## Build
+
+### Build with `wasm-pack`
+
+```
+wasm-pack build
+```
+
+Should add "rust_heatmap_bg.wasm.d.ts" in pkg/package.json
 
 ## License
 

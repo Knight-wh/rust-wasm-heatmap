@@ -51,12 +51,12 @@ impl HeatMap {
         (row * self.size_x + colume) as usize
     }
 
-    fn get_row(&self, y: f64) -> u32 {
-        ((y - self.min_y) / self.per_pixel).floor() as u32
+    fn get_row(&self, y: f64) -> i32 {
+        ((y - self.min_y) / self.per_pixel).floor() as i32
     }
 
-    fn get_col(&self, x: f64) -> u32 {
-        ((x - self.min_x) / self.per_pixel).floor() as u32
+    fn get_col(&self, x: f64) -> i32 {
+        ((x - self.min_x) / self.per_pixel).floor() as i32
     }
 
     fn update_heat_values(&mut self, point: &HeatPoint) {
@@ -65,8 +65,8 @@ impl HeatMap {
         let col = self.get_col(point.x);
         for dx in -(radius as i32)..=radius as i32 {
             for dy in -(radius as i32)..=radius as i32 {
-                let nx = col as i32 + dx;
-                let ny = row as i32 + dy;
+                let nx = col + dx;
+                let ny = row + dy;
 
                 if nx >= 0 && nx < self.size_x as i32 && ny >= 0 && ny < self.size_y as i32 {
                     let distance = ((dx * dx + dy * dy) as f64).sqrt();
@@ -223,7 +223,6 @@ impl HeatMap {
 
     pub fn set_radius(&mut self, radius: usize) {
         self.radius = radius as u32;
-        self.update_color_values();
     }
 
     pub fn width(&self) -> u32 {
@@ -237,6 +236,16 @@ impl HeatMap {
     pub fn heat_value(&self, row: usize, col: usize) -> f64 {
         let idx = self.get_index(row as u32, col as u32);
         self.heat_values[idx]
+    }
+
+    pub fn reset(&mut self) {
+        self.heat_values.fill(0.0);
+        self.color_values.fill(RGBA {
+            r: 0,
+            g: 0,
+            b: 0,
+            a: 0,
+        });
     }
 
     pub fn color_value(&self, row: usize, col: usize) -> RGBA {
