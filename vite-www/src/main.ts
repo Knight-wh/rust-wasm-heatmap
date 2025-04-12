@@ -17,4 +17,4 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   </div>
 `;
 
-setupCanvas(document.querySelector<HTMLCanvasElement>("#myCanvas")!);
+setupCanvas();

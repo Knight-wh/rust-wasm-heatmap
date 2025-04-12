@@ -1,4 +1,4 @@
-import { HeatMap, HeatPoint, RGBA } from "rust-wasm-heatmap";
+import { HeatMap, RGBA } from "rust-wasm-heatmap";
 import { memory } from "rust-wasm-heatmap/rust_wasm_heatmap_bg.wasm";
 
 const canvasHeight = 400;
@@ -14,7 +14,8 @@ const gradient = ["00AAFF", "00FF00", "FFFF00", "FF8800", "FF0000"];
 const rgbas = parseGradient(gradient).map((g) => RGBA.new(g.r, g.g, g.b, 255));
 heatmap.set_gradients(rgbas);
 
-export function setupCanvas(canvas: HTMLCanvasElement) {
+export function setupCanvas() {
+  const canvas = document.querySelector<HTMLCanvasElement>("#myCanvas")!;
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 
@@ -27,9 +28,14 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
   for (let i = 0; i < 50; i++) {
     let x = Math.random() * (maxX - minX) + minX;
     let y = Math.random() * (maxY - minY) + minY;
-    points.push(HeatPoint.new(x, y, Math.random() * maxHeat));
+    let heat = Math.random() * maxHeat;
+    // v1
+    // points.push(HeatPoint.new(x, y, heat));
+    points.push(x, y, heat);
   }
-  heatmap.add_points(points);
+  // v1
+  // heatmap.add_points(points);
+  heatmap.add_points_v2(new Float64Array(points));
   const ctx = canvas.getContext("2d");
   // Draw
   if (!ctx) return;
@@ -44,6 +50,7 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
   createImageBitmap(imageData, { imageOrientation: "flipY" }).then((bitmap) => {
     ctx.drawImage(bitmap, 0, 0);
   });
+  heatmap.free();
 }
 
 function parseGradient(
