@@ -42,6 +42,7 @@ pub struct HeatMap {
     min_x: f64,
     min_y: f64,
     per_pixel: f64,
+    flip_y: bool,
     heat_values: Vec<f64>,
     color_values: Vec<RGBA>,
 }
@@ -52,7 +53,11 @@ impl HeatMap {
     }
 
     fn get_row(&self, y: f64) -> i32 {
-        ((y - self.min_y) / self.per_pixel).floor() as i32
+        if self.flip_y {
+            self.size_y as i32 - ((y - self.min_y) / self.per_pixel).floor() as i32 - 1
+        } else {
+            ((y - self.min_y) / self.per_pixel).floor() as i32
+        }
     }
 
     fn get_col(&self, x: f64) -> i32 {
@@ -162,6 +167,8 @@ impl HeatMap {
 
         let gradient = default_gradients();
 
+        let flip_y = true;
+
         HeatMap {
             size_x: size_x as u32,
             size_y: size_y as u32,
@@ -171,6 +178,7 @@ impl HeatMap {
             min_x,
             min_y,
             per_pixel,
+            flip_y,
             heat_values,
             color_values,
         }
@@ -223,6 +231,10 @@ impl HeatMap {
 
     pub fn set_radius(&mut self, radius: usize) {
         self.radius = radius as u32;
+    }
+
+    pub fn set_flip_y(&mut self, flip_y: bool) {
+        self.flip_y = flip_y;
     }
 
     pub fn width(&self) -> u32 {
