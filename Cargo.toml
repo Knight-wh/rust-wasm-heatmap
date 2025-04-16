@@ -1,6 +1,6 @@
 [package]
 name = "rust-wasm-heatmap"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["Knight-wh <yffcbgh@163.com>"]
 edition = "2021"
 
