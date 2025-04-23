@@ -1,5 +1,6 @@
 import { HeatMap, RGBA } from "rust-wasm-heatmap";
 import { memory } from "rust-wasm-heatmap/rust_wasm_heatmap_bg.wasm";
+import { parseGradient } from "./utils";
 
 const canvasHeight = 400;
 const canvasWidth = 400;
@@ -72,43 +73,4 @@ export async function setupCanvas() {
   }
 
   heatmap.free();
-}
-
-function parseGradient(
-  gradient: string[] | number[][]
-): { r: number; g: number; b: number }[] {
-  return gradient.map((color) => {
-    if (color.toString().match(/^#?[0-9a-f]{3}$/i)) {
-      color = color.toString().replace(/^#?(.)(.)(.)$/, "$1$1$2$2$3$3");
-    }
-    if (typeof color === "string") {
-      if (color.match(/^#?[0-9a-f]{6}$/i)) {
-        // @ts-ignore
-        color = color
-          .match(/^#?(..)(..)(..)$/)
-          .slice(1)
-          .map((n) => parseInt(n, 16));
-      } else {
-        throw Error(`Invalid color format (${color}).`);
-      }
-    } else if (color instanceof Array) {
-      if (
-        !(
-          color.length &&
-          isUint8(color[0]) &&
-          isUint8(color[1]) &&
-          isUint8(color[2])
-        )
-      ) {
-        throw Error(`Invalid color format (${JSON.stringify(color)}).`);
-      }
-    } else {
-      throw Error(`Invalid color object (${JSON.stringify(color)}).`);
-    }
-    return { r: color[0], g: color[1], b: color[2] };
-  });
-}
-
-function isUint8(num: number) {
-  return typeof num == "number" && 0 <= num && num >= 255;
 }
