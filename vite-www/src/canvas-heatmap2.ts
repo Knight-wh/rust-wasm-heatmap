@@ -1,4 +1,4 @@
-import { HeatMap, RGBA } from "rust-wasm-heatmap";
+import { HeatMapV2, RGBA } from "rust-wasm-heatmap";
 import { memory } from "rust-wasm-heatmap/rust_wasm_heatmap_bg.wasm";
 import { parseGradient } from "./utils";
 
@@ -9,20 +9,25 @@ const minX = 0.0,
   minY = 0.0,
   maxX = 10.0,
   maxY = 10.0,
-  maxHeat = 20.0;
-const heatmap = HeatMap.new(400, 20.0, minX, minY, maxX, maxY, maxHeat);
+  maxHeat = 20.0,
+  radius = 20.0,
+  size = 400;
+const hmap = HeatMapV2.new();
 const gradient = ["00AAFF", "00FF00", "FFFF00", "FF8800", "FF0000"];
 const rgbas = parseGradient(gradient).map((g) => RGBA.new(g.r, g.g, g.b, 255));
-heatmap.set_gradients(rgbas);
-heatmap.set_flip_y(false);
+hmap.set_gradients(rgbas);
+hmap.set_radius(radius);
+hmap.set_max_heat(maxHeat);
+hmap.set_flip_y(false);
+hmap.set_size(size, minX, minY, maxX, maxY);
 
 export async function setupCanvas() {
   const canvas = document.querySelector<HTMLCanvasElement>("#myCanvas")!;
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 
-  const hw = heatmap.width();
-  const hh = heatmap.height();
+  const hw = hmap.width();
+  const hh = hmap.height();
   console.log("width", hw);
   console.log("height", hh);
 
@@ -31,31 +36,19 @@ export async function setupCanvas() {
     let x = Math.random() * (maxX - minX) + minX;
     let y = Math.random() * (maxY - minY) + minY;
     let heat = Math.random() * maxHeat;
-    // v1
-    // points.push(HeatPoint.new(x, y, heat));
     points.push(x, y, heat);
   }
-  // v1
-  // heatmap.add_points(points);
-  // heatmap.add_points_v2(new Float64Array(points));
-  heatmap.add_points_v3(new Float64Array(points));
-  heatmap.calc_heatmap();
+  hmap.add_points(new Float64Array(points));
+  hmap.calc_heatmap();
+  const colorsPtr = hmap.color_values();
+  const uintc8 = new Uint8ClampedArray(memory.buffer, colorsPtr, 4 * hw * hh);
 
   const ctx = canvas.getContext("2d");
   // Draw
   if (!ctx) return;
   ctx.strokeRect(0, 0, hw, hh);
   // Draw Heat map
-  const colorsPtr = heatmap.color_values();
-  const colorsArr = new Uint8ClampedArray(
-    memory.buffer,
-    colorsPtr,
-    4 * hw * hh
-  );
-  const imageData = new ImageData(colorsArr, hw, hh);
-  // const bitmap = await createImageBitmap(imageData, {
-  //   imageOrientation: "flipY",
-  // });
+  const imageData = new ImageData(uintc8, hw, hh);
   const bitmap = await createImageBitmap(imageData);
   ctx.drawImage(bitmap, 0, 0);
   bitmap.close();
@@ -74,5 +67,5 @@ export async function setupCanvas() {
     ctx.fillText(`${heat.toFixed(1)}`, heatX, heatY);
   }
 
-  heatmap.free();
+  hmap.free();
 }
