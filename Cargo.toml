@@ -1,6 +1,6 @@
 [package]
 name = "rust-wasm-heatmap"
-version = "0.1.6"
+version = "0.1.7"
 authors = ["Knight-wh <yffcbgh@163.com>"]
 edition = "2021"
 
@@ -11,7 +11,7 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-wasm-bindgen = "0.2.84"
+wasm-bindgen = "0.2.95"
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
